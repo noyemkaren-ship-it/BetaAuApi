@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Вход — Betta</title>
+    <style>${css}</style>
+</head>
+<body class="auth-body">
+
+<div class="auth-bg">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+</div>
+
+<a href="/" class="auth-brand">
+    <div class="brand-logo">B</div>
+    <span>Betta</span>
+</a>
+
+<main class="auth-wrap">
+    <div class="auth-card reveal">
+        <div class="auth-head">
+            <div class="brand-logo big">B</div>
+            <h1>С возвращением</h1>
+            <p class="text-muted">Войди, чтобы продолжить обучение</p>
+        </div>
+
+        <form id="login-form" class="auth-form">
+            <div class="field">
+                <label for="name">Имя пользователя</label>
+                <input type="text" id="name" name="name" placeholder="Введи имя"
+                       required autocomplete="username">
+            </div>
+            <div class="field">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password"
+                       placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <div id="message" class="hidden"></div>
+
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-full">
+                Войти
+            </button>
+        </form>
+
+        <p class="auth-foot">
+            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+        </p>
+    </div>
+</main>
+
+<script>
+    (function () {
+        var form = document.getElementById('login-form');
+        var btn = document.getElementById('submit-btn');
+        var msg = document.getElementById('message');
+
+        function show(text, type) {
+            msg.textContent = text;
+            msg.className = type;
+            msg.style.display = 'block';
+        }
+        function hide() { msg.style.display = 'none'; }
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hide();
+            btn.disabled = true;
+            btn.textContent = 'Входим...';
+
+            var payload = {
+                name: form.name.value.trim(),
+                password: form.password.value
+            };
+
+            try {
+                var res = await fetch('/user/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                var data = await res.json().catch(function () { return {}; });
+
+                if (!res.ok) {
+                    show(data.detail || data.message || 'Неверное имя или пароль', 'error');
+                    return;
+                }
+
+                show('Успешный вход! Перенаправляем...', 'success');
+                setTimeout(function () { window.location.href = '/'; }, 600);
+            } catch (err) {
+                show('Ошибка сети. Попробуй позже.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Войти';
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>

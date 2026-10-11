@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Уроки — Betta</title>
+    <style>${css}</style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="/" class="brand">
+            <div class="brand-logo">B</div>
+            <div class="brand-text">
+                <span class="brand-name">Betta</span>
+                <span class="brand-tag">Каталог уроков</span>
+            </div>
+        </a>
+
+        <nav class="site-nav">
+            <a href="/">Главная</a>
+            <a href="/lessons" class="active">Уроки</a>
+            <a href="/me/page">Профиль</a>
+        </nav>
+
+        <div class="site-actions">
+            % if user_name:
+                <span class="user-pill">
+                    <span class="user-pill-name">${user_name}</span>
+                    <span class="user-pill-xp">${user_xp} XP</span>
+                </span>
+            % else:
+                <a href="/login" class="btn btn-ghost btn-sm">Войти</a>
+                <a href="/register" class="btn btn-primary btn-sm">Начать</a>
+            % endif
+        </div>
+    </div>
+</header>
+
+<main class="page">
+    <div class="page-bg">
+        <div class="hero-blob hero-blob-1"></div>
+    </div>
+
+    <div class="page-inner">
+        <!-- Page head -->
+        <section class="page-hero reveal">
+            <span class="hero-eyebrow">
+                <span class="dot"></span>
+                Каталог
+            </span>
+            <h1 class="page-title">
+                Все <span class="grad">уроки</span> платформы
+            </h1>
+            <p class="page-sub">
+                Выбирай тему, фильтруй по предмету и начинай.
+                Каждый урок приносит опыт и приближает к цели.
+            </p>
+        </section>
+
+        % if not lessons:
+            <div class="empty reveal">
+                <div class="empty-icon">📭</div>
+                <h3>Пока нет уроков</h3>
+                <p class="text-muted">Загляни позже — скоро появятся материалы.</p>
+            </div>
+        % else:
+            <!-- Toolbar -->
+            <div class="toolbar reveal">
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input"
+                           placeholder="Поиск по названию или предмету..."
+                           autocomplete="off">
+                    <button type="button" id="search-clear" class="search-clear hidden">×</button>
+                </div>
+
+                <div class="sort-wrap">
+                    <label for="sort-select">Сортировка</label>
+                    <select id="sort-select">
+                        <option value="default">По умолчанию</option>
+                        <option value="xp-desc">XP: по убыванию</option>
+                        <option value="xp-asc">XP: по возрастанию</option>
+                        <option value="title-asc">Название: А-Я</option>
+                        <option value="title-desc">Название: Я-А</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters reveal" id="filters">
+                <button type="button" class="chip chip-active" data-subject="all">Все</button>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid" id="lessons-grid">
+                % for lesson in lessons:
+                    <a href="/lesson/${lesson.id}" class="lesson-tile reveal"
+                       data-title="${lesson.title}"
+                       data-subject="${lesson.subject or ''}"
+                       data-xp="${lesson.xp}">
+                        <div class="tile-top">
+                            <span class="badge badge-subject">${lesson.subject or "Общее"}</span>
+                            <span class="badge badge-xp">⚡ ${lesson.xp} XP</span>
+                        </div>
+                        <h3 class="tile-title">${lesson.title}</h3>
+                        <div class="tile-bottom">
+                            <span class="text-muted">Подписок: ${lesson.subs or 0}</span>
+                            <span class="tile-arrow">→</span>
+                        </div>
+                    </a>
+                % endfor %}
+            </div>
+
+            <div class="empty hidden" id="no-results">
+                <div class="empty-icon">🔍</div>
+                <h3>Ничего не найдено</h3>
+                <p class="text-muted">Попробуй изменить запрос или сбросить фильтры.</p>
+                <button type="button" class="btn btn-outline mt-2" id="reset-filters">Сбросить</button>
+            </div>
+        % endif %}
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-bottom">
+        <span>© Betta API — 2026</span>
+        <span class="text-muted">Учись системно. Расти каждый день.</span>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        // --- Reveal on scroll ---
+        var revealEls = document.querySelectorAll('.reveal');
+        if ('IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('revealed');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+            revealEls.forEach(function (el) { io.observe(el); });
+        } else {
+            revealEls.forEach(function (el) { el.classList.add('revealed'); });
+        }
+
+        // --- Filters + Search + Sort ---
+        var grid = document.getElementById('lessons-grid');
+        if (!grid) return;
+
+        var cards = Array.prototype.slice.call(grid.querySelectorAll('.lesson-tile'));
+        var searchInput = document.getElementById('search-input');
+        var searchClear = document.getElementById('search-clear');
+        var sortSelect = document.getElementById('sort-select');
+        var filtersBox = document.getElementById('filters');
+        var noResults = document.getElementById('no-results');
+        var resetBtn = document.getElementById('reset-filters');
+
+        var activeSubject = 'all';
+        var query = '';
+
+        var subjects = {};
+        cards.forEach(function (c) {
+            var s = c.getAttribute('data-subject') || 'Общее';
+            subjects[s] = (subjects[s] || 0) + 1;
+        });
+
+        Object.keys(subjects).sort().forEach(function (s) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'chip';
+            btn.setAttribute('data-subject', s);
+            btn.textContent = s + ' (' + subjects[s] + ')';
+            filtersBox.appendChild(btn);
+        });
+
+        function applyFilters() {
+            var visible = 0;
+            cards.forEach(function (c) {
+                var title = (c.getAttribute('data-title') || '').toLowerCase();
+                var subject = (c.getAttribute('data-subject') || 'Общее').toLowerCase();
+                var matchQuery = !query
+                    || title.indexOf(query) !== -1
+                    || subject.indexOf(query) !== -1;
+                var matchSubject = activeSubject === 'all'
+                    || (c.getAttribute('data-subject') || 'Общее') === activeSubject;
+
+                if (matchQuery && matchSubject) {
+                    c.style.display = '';
+                    visible++;
+                } else {
+                    c.style.display = 'none';
+                }
+            });
+
+            if (noResults) {
+                noResults.classList.toggle('hidden', visible !== 0);
+            }
+        }
+
+        function applySort(mode) {
+            if (mode === 'default') return;
+            var sorted = cards.slice().sort(function (a, b) {
+                if (mode === 'xp-desc') return parseFloat(b.dataset.xp) - parseFloat(a.dataset.xp);
+                if (mode === 'xp-asc')  return parseFloat(a.dataset.xp) - parseFloat(b.dataset.xp);
+                if (mode === 'title-asc')  return a.dataset.title.localeCompare(b.dataset.title, 'ru');
+                if (mode === 'title-desc') return b.dataset.title.localeCompare(a.dataset.title, 'ru');
+                return 0;
+            });
+            sorted.forEach(function (c) { grid.appendChild(c); });
+            cards = sorted;
+            applyFilters();
+        }
+
+        var debounce;
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                clearTimeout(debounce);
+                debounce = setTimeout(function () {
+                    query = searchInput.value.trim().toLowerCase();
+                    if (query) searchClear.classList.remove('hidden');
+                    else searchClear.classList.add('hidden');
+                    applyFilters();
+                }, 120);
+            });
+        }
+
+        if (searchClear) {
+            searchClear.addEventListener('click', function () {
+                searchInput.value = '';
+                query = '';
+                searchClear.classList.add('hidden');
+                applyFilters();
+                searchInput.focus();
+            });
+        }
+
+        if (filtersBox) {
+            filtersBox.addEventListener('click', function (e) {
+                var btn = e.target.closest('.chip');
+                if (!btn) return;
+                filtersBox.querySelectorAll('.chip').forEach(function (b) {
+                    b.classList.remove('chip-active');
+                });
+                btn.classList.add('chip-active');
+                activeSubject = btn.getAttribute('data-subject');
+                applyFilters();
+            });
+        }
+
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function () {
+                applySort(sortSelect.value);
+            });
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                query = '';
+                searchClear.classList.add('hidden');
+                activeSubject = 'all';
+                sortSelect.value = 'default';
+                filtersBox.querySelectorAll('.chip').forEach(function (b) {
+                    b.classList.toggle('chip-active',
+                        b.getAttribute('data-subject') === 'all');
+                });
+                applyFilters();
+            });
+        }
+
+        applyFilters();
+    })();
+</script>
+
+</body>
+</html>

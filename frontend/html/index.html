@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Betta — платформа обучения</title>
+    <style>${css}</style>
+</head>
+<body>
+
+<%
+    # --- Считаем уровень ---
+    _xp = int(user_xp or 0)
+    _level = _xp // 100 + 1
+    _xp_in_level = _xp % 100
+    _xp_percent = _xp_in_level  # 100 XP = 100%
+%>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="/" class="brand">
+            <div class="brand-logo">B</div>
+            <div class="brand-text">
+                <span class="brand-name">Betta</span>
+                <span class="brand-tag">Learning Platform</span>
+            </div>
+        </a>
+
+        <nav class="site-nav">
+            <a href="/lessons">Уроки</a>
+            <a href="/me/page">Профиль</a>
+            <a href="#about">О платформе</a>
+        </nav>
+
+        <div class="site-actions">
+            % if user_name:
+                <span class="user-pill">
+                    <span class="user-pill-level">Lv.${_level}</span>
+                    <span class="user-pill-name">${user_name}</span>
+                    <span class="user-pill-xp">${_xp} XP</span>
+                </span>
+                <a href="/logout" class="btn btn-ghost btn-sm">Выйти</a>
+            % else:
+                <a href="/login" class="btn btn-ghost btn-sm">Войти</a>
+                <a href="/register" class="btn btn-primary btn-sm">Начать</a>
+            % endif
+        </div>
+    </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+    </div>
+
+    <div class="hero-inner">
+        <div class="hero-content">
+            <span class="hero-eyebrow">
+                <span class="dot"></span>
+                Платформа для обучения
+            </span>
+
+            <h1 class="hero-title">
+                Учись системно.<br>
+                Расти <span class="grad">каждый день</span>.
+            </h1>
+
+            <p class="hero-sub">
+                Betta — это структурированные уроки, прозрачная система опыта
+                и прогресс, который видно. Всё, чтобы учиться без хаоса
+                и видеть результат.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/lessons" class="btn btn-primary btn-lg">
+                    Начать обучение
+                    <span class="btn-arrow">→</span>
+                </a>
+                % if not user_name:
+                    <a href="/register" class="btn btn-outline btn-lg">
+                        Создать аккаунт
+                    </a>
+                % endif
+            </div>
+
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <strong>+10 XP</strong>
+                    <span>за урок</span>
+                </div>
+                <div class="hero-meta-divider"></div>
+                <div class="hero-meta-item">
+                    <strong>∞</strong>
+                    <span>тем и предметов</span>
+                </div>
+                <div class="hero-meta-divider"></div>
+                <div class="hero-meta-item">
+                    <strong>24/7</strong>
+                    <span>доступ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Иллюстрация с РЕАЛЬНЫМИ данными юзера -->
+        <div class="hero-illustration" aria-hidden="true">
+            <svg viewBox="0 0 520 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="var(--primary)"/>
+                        <stop offset="100%" stop-color="var(--accent)"/>
+                    </linearGradient>
+                    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.15"/>
+                        <stop offset="100%" stop-color="var(--primary)" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- Фон-карточка -->
+                <rect x="40" y="60" width="440" height="340" rx="24"
+                      fill="url(#g2)" stroke="var(--border)" stroke-width="1"/>
+
+                <!-- График роста -->
+                <path d="M90 340 L170 300 L250 320 L330 240 L410 180"
+                      stroke="url(#g1)" stroke-width="4"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="90" cy="340" r="6" fill="var(--primary)"/>
+                <circle cx="170" cy="300" r="6" fill="var(--primary)"/>
+                <circle cx="250" cy="320" r="6" fill="var(--primary)"/>
+                <circle cx="330" cy="240" r="6" fill="var(--primary)"/>
+                <circle cx="410" cy="180" r="8" fill="var(--accent)"/>
+
+                <!-- Карточка прогресса до след. уровня -->
+                <rect x="270" y="90" width="180" height="90" rx="14"
+                      fill="var(--bg-elevated)" stroke="var(--border)"/>
+                <text x="290" y="120" font-family="sans-serif" font-size="12"
+                      fill="var(--text-muted)">Уровень ${_level}</text>
+                <text x="290" y="152" font-family="sans-serif" font-size="22"
+                      font-weight="700" fill="var(--text)">${_xp_percent}%</text>
+
+                <!-- Прогресс-бар -->
+                <rect x="290" y="162" width="140" height="8" rx="4"
+                      fill="var(--bg-hover)"/>
+                <rect x="290" y="162" width="${int(140 * _xp_percent / 100)}" height="8" rx="4"
+                      fill="url(#g1)"/>
+
+                <!-- Карточка XP -->
+                <rect x="70" y="120" width="150" height="80" rx="14"
+                      fill="var(--bg-elevated)" stroke="var(--border)"/>
+                <text x="90" y="148" font-family="sans-serif" font-size="12"
+                      fill="var(--text-muted)">Твой опыт</text>
+                <text x="90" y="178" font-family="sans-serif" font-size="20"
+                      font-weight="700" fill="var(--success)">⚡ ${_xp} XP</text>
+
+                <!-- До следующего уровня -->
+                <text x="90" y="192" font-family="sans-serif" font-size="10"
+                      fill="var(--text-muted)">${_xp_in_level}/100 до Lv.${_level + 1}</text>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- ============ STATS BAR ============ -->
+<section class="stats-bar">
+    <div class="stats-bar-inner">
+        <div class="stat">
+            <span class="stat-num">12+</span>
+            <span class="stat-text">предметов</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">100+</span>
+            <span class="stat-text">уроков</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">24/7</span>
+            <span class="stat-text">доступ</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">100%</span>
+            <span class="stat-text">бесплатно</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="about" id="about">
+    <div class="section-head">
+        <span class="section-eyebrow">Почему это важно</span>
+        <h2 class="section-title">
+            Знания — это <span class="grad">инвестиция</span>,<br>
+            которая работает всю жизнь
+        </h2>
+        <p class="section-sub">
+            Мир меняется быстрее, чем когда-либо. Тот, кто учится постоянно —
+            выигрывает. Betta помогает не бросить на полпути: короткие уроки,
+            понятный прогресс и мотивация через опыт.
+        </p>
+    </div>
+
+    <div class="cards-grid">
+        <article class="info-card reveal">
+            <div class="info-illustration">
+                <svg viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="20" width="160" height="100" rx="12"
+                          fill="var(--primary-soft)" stroke="var(--border)"/>
+                    <circle cx="60" cy="60" r="14" fill="var(--primary)"/>
+                    <path d="M50 60 L57 67 L72 52" stroke="white" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="85" y="48" width="80" height="8" rx="4" fill="var(--primary)" opacity="0.6"/>
+                    <rect x="85" y="64" width="60" height="8" rx="4" fill="var(--primary)" opacity="0.3"/>
+                    <rect x="40" y="88" width="120" height="8" rx="4" fill="var(--primary)" opacity="0.2"/>
+                </svg>
+            </div>
+            <h3>Системный подход</h3>
+            <p>
+                Материал разбит на короткие уроки. Учись по 15 минут в день —
+                и за месяц пройдёшь то, что раньше казалось невозможным.
+            </p>
+        </article>
+
+        <article class="info-card reveal">
+            <div class="info-illustration">
+                <svg viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="20" width="160" height="100" rx="12"
+                          fill="var(--success-soft)" stroke="var(--border)"/>
+                    <path d="M40 100 L70 80 L100 90 L130 60 L160 45"
+                          stroke="var(--success)" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="160" cy="45" r="5" fill="var(--success)"/>
+                    <circle cx="40" cy="100" r="5" fill="var(--success)"/>
+                </svg>
+            </div>
+            <h3>Прогресс, который видно</h3>
+            <p>
+                Каждый урок даёт XP. Ты видишь, как растёт твой опыт —
+                это мотивирует продолжать, даже когда лень.
+            </p>
+        </article>
+
+        <article class="info-card reveal">
+            <div class="info-illustration">
+                <svg viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="20" width="160" height="100" rx="12"
+                          fill="var(--accent-soft)" stroke="var(--border)"/>
+                    <circle cx="70" cy="60" r="18" fill="var(--accent)"/>
+                    <circle cx="100" cy="60" r="18" fill="var(--primary)" opacity="0.7"/>
+                    <circle cx="130" cy="60" r="18" fill="var(--success)" opacity="0.7"/>
+                    <text x="70" y="66" font-family="sans-serif" font-size="14"
+                          fill="white" text-anchor="middle" font-weight="700">A</text>
+                    <text x="100" y="66" font-family="sans-serif" font-size="14"
+                          fill="white" text-anchor="middle" font-weight="700">Б</text>
+                    <text x="130" y="66" font-family="sans-serif" font-size="14"
+                          fill="white" text-anchor="middle" font-weight="700">В</text>
+                </svg>
+            </div>
+            <h3>Разные предметы</h3>
+            <p>
+                Языки, программирование, математика, дизайн — выбирай то,
+                что нужно именно тебе. И переключайся, когда захочешь.
+            </p>
+        </article>
+    </div>
+</section>
+
+<!-- ============ WHY LANGUAGES ============ -->
+<section class="feature-split">
+    <div class="feature-split-inner">
+        <div class="feature-split-text reveal">
+            <span class="section-eyebrow">Зачем учить языки и новое</span>
+            <h2 class="section-title">
+                Один язык открывает<br>одну дверь. Два — <span class="grad">целый мир</span>.
+            </h2>
+            <p>
+                Знание второго языка — это не про «умение переводить».
+                Это доступ к другой культуре, к другим работам, к другим людям.
+                Мозг, который учится, работает лучше: улучшается память,
+                концентрация и способность решать сложные задачи.
+            </p>
+            <ul class="check-list">
+                <li>Больше возможностей в карьере и учёбе</li>
+                <li>Свобода путешествовать без барьера</li>
+                <li>Тренировка памяти и мышления</li>
+                <li>Уверенность в любой среде</li>
+            </ul>
+            <a href="/lessons" class="btn btn-primary">
+                Смотреть уроки <span class="btn-arrow">→</span>
+            </a>
+        </div>
+
+        <div class="feature-split-visual reveal">
+            <div class="visual-card">
+                <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="200" cy="200" r="160" fill="var(--primary-soft)"/>
+                    <circle cx="200" cy="200" r="120" fill="var(--bg-elevated)"
+                            stroke="var(--border)"/>
+
+                    <ellipse cx="200" cy="200" rx="120" ry="40"
+                             stroke="var(--primary)" stroke-width="1.5" opacity="0.4"/>
+                    <ellipse cx="200" cy="200" rx="40" ry="120"
+                             stroke="var(--primary)" stroke-width="1.5" opacity="0.4"/>
+                    <line x1="80" y1="200" x2="320" y2="200"
+                          stroke="var(--primary)" stroke-width="1.5" opacity="0.4"/>
+
+                    <circle cx="150" cy="170" r="6" fill="var(--accent)"/>
+                    <circle cx="260" cy="220" r="6" fill="var(--success)"/>
+                    <circle cx="200" cy="130" r="6" fill="var(--primary)"/>
+                    <circle cx="180" cy="260" r="6" fill="var(--accent)"/>
+
+                    <path d="M150 170 Q200 150 200 130" stroke="var(--accent)"
+                          stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
+                    <path d="M200 130 Q250 180 260 220" stroke="var(--success)"
+                          stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
+                    <path d="M260 220 Q220 250 180 260" stroke="var(--accent)"
+                          stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
+                </svg>
+            </div>
+
+            <div class="floating-badge floating-badge-1">
+                <span class="fb-icon">🌍</span>
+                <div>
+                    <strong>12+</strong>
+                    <span>языков и тем</span>
+                </div>
+            </div>
+
+            <div class="floating-badge floating-badge-2">
+                <span class="fb-icon">⚡</span>
+                <div>
+                    <strong>+10 XP</strong>
+                    <span>за урок</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta">
+    <div class="cta-inner reveal">
+        <h2>Готов начать?</h2>
+        <p>Зарегистрируйся за 30 секунд и открой первый урок прямо сейчас.</p>
+        <div class="cta-actions">
+            % if user_name:
+                <a href="/lessons" class="btn btn-primary btn-lg">
+                    Продолжить обучение <span class="btn-arrow">→</span>
+                </a>
+            % else:
+                <a href="/register" class="btn btn-primary btn-lg">
+                    Создать аккаунт <span class="btn-arrow">→</span>
+                </a>
+                <a href="/login" class="btn btn-outline btn-lg">У меня уже есть</a>
+            % endif
+        </div>
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+    <div class="site-footer-inner">
+        <div class="footer-brand">
+            <div class="brand-logo">B</div>
+            <div>
+                <strong>Betta</strong>
+                <p class="text-muted">Платформа для обучения с системой опыта</p>
+            </div>
+        </div>
+
+        <div class="footer-cols">
+            <div>
+                <h4>Платформа</h4>
+                <a href="/lessons">Уроки</a>
+                <a href="/me/page">Профиль</a>
+            </div>
+            <div>
+                <h4>Аккаунт</h4>
+                <a href="/login">Вход</a>
+                <a href="/register">Регистрация</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span>© Betta API — 2026</span>
+        <span class="text-muted">Сделано с ♥ для тех, кто учится</span>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        var els = document.querySelectorAll('.reveal');
+        if (!('IntersectionObserver' in window)) {
+            els.forEach(function (el) { el.classList.add('revealed'); });
+            return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+        els.forEach(function (el) { io.observe(el); });
+    })();
+</script>
+
+</body>
+</html>

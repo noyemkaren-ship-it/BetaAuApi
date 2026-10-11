@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Регистрация — Betta</title>
+    <style>${css}</style>
+</head>
+<body class="auth-body">
+
+<div class="auth-bg">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+</div>
+
+<a href="/" class="auth-brand">
+    <div class="brand-logo">B</div>
+    <span>Betta</span>
+</a>
+
+<main class="auth-wrap">
+    <div class="auth-card auth-card-wide reveal">
+        <div class="auth-head">
+            <div class="brand-logo big">B</div>
+            <h1>Создать аккаунт</h1>
+            <p class="text-muted">Начни учиться и зарабатывать опыт</p>
+        </div>
+
+        <form id="register-form" class="auth-form" novalidate>
+            <div class="field">
+                <label for="name">Имя пользователя</label>
+                <input type="text" id="name" name="name" placeholder="Придумай имя"
+                       required autocomplete="username" minlength="3">
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com"
+                           required autocomplete="email">
+                </div>
+                <div class="field">
+                    <label for="phone">Телефон</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+7 999 123-45-67"
+                           required autocomplete="tel">
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••"
+                           required autocomplete="new-password" minlength="6">
+                </div>
+                <div class="field">
+                    <label for="password2">Повтори пароль</label>
+                    <input type="password" id="password2" name="password2" placeholder="••••••••"
+                           required autocomplete="new-password" minlength="6">
+                </div>
+            </div>
+
+            <label class="consent-row" for="consent">
+                <input type="checkbox" id="consent" name="consent" required>
+                <span>
+                    Я согласен на обработку персональных данных
+                    (имя, email, телефон) в целях работы платформы
+                    и принимаю
+                    <a href="/terms" target="_blank" rel="noopener">пользовательское соглашение</a>
+                    и
+                    <a href="/privacy" target="_blank" rel="noopener">политику конфиденциальности</a>.
+                </span>
+            </label>
+
+            <div id="message" class="hidden"></div>
+
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-full" disabled>
+                Создать аккаунт
+            </button>
+        </form>
+
+        <p class="auth-foot">
+            Уже есть аккаунт? <a href="/login">Войти</a>
+        </p>
+    </div>
+</main>
+
+<script>
+    (function () {
+        var form = document.getElementById('register-form');
+        var btn = document.getElementById('submit-btn');
+        var msg = document.getElementById('message');
+        var consent = document.getElementById('consent');
+
+        function show(text, type) {
+            msg.textContent = text;
+            msg.className = type;
+            msg.style.display = 'block';
+        }
+        function hide() { msg.style.display = 'none'; }
+
+        // Кнопка активна только если галочка стоит
+        function syncBtn() {
+            btn.disabled = !consent.checked;
+        }
+        consent.addEventListener('change', syncBtn);
+        syncBtn();
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hide();
+
+            if (!consent.checked) {
+                show('Необходимо согласие на обработку персональных данных', 'error');
+                return;
+            }
+
+            var pass = form.password.value;
+            var pass2 = form.password2.value;
+
+            if (pass !== pass2) { show('Пароли не совпадают', 'error'); return; }
+            if (pass.length < 6) { show('Пароль должен быть минимум 6 символов', 'error'); return; }
+
+            btn.disabled = true;
+            btn.textContent = 'Создаём...';
+
+            var payload = {
+                name: form.name.value.trim(),
+                email: form.email.value.trim(),
+                phone: form.phone.value.trim(),
+                password: pass,
+                consent: true
+            };
+
+            try {
+                var res = await fetch('/user/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                var data = await res.json().catch(function () { return {}; });
+
+                if (!res.ok) {
+                    var errorText = 'Ошибка регистрации';
+                    if (data.detail) {
+                        errorText = Array.isArray(data.detail)
+                            ? data.detail.map(function (d) { return d.msg; }).join(', ')
+                            : data.detail;
+                    } else if (data.message) {
+                        errorText = data.message;
+                    }
+                    show(errorText, 'error');
+                    return;
+                }
+
+                show('Аккаунт создан! Перенаправляем...', 'success');
+                setTimeout(function () { window.location.href = '/'; }, 700);
+            } catch (err) {
+                show('Ошибка сети. Попробуй позже.', 'error');
+            } finally {
+                btn.disabled = !consent.checked;
+                btn.textContent = 'Создать аккаунт';
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>

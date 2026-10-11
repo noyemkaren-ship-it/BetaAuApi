@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Профиль — Betta</title>
+    <style>${css}</style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="/" class="brand">
+            <div class="brand-logo">B</div>
+            <div class="brand-text">
+                <span class="brand-name">Betta</span>
+                <span class="brand-tag">Профиль</span>
+            </div>
+        </a>
+
+        <nav class="site-nav">
+            <a href="/">Главная</a>
+            <a href="/lessons">Уроки</a>
+            <a href="/me/page" class="active">Профиль</a>
+        </nav>
+
+        <div class="site-actions">
+            <a href="/logout" class="btn btn-ghost btn-sm">Выйти</a>
+        </div>
+    </div>
+</header>
+
+<main class="page">
+    <div class="page-bg">
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+    </div>
+
+    <div class="page-inner">
+
+        <!-- Profile hero -->
+        <section class="profile-hero reveal">
+            <div class="avatar-wrap">
+                <div class="avatar-ring"></div>
+                <div class="avatar">${username[0].upper() if username else "?"}</div>
+                <div class="avatar-badge">⚡</div>
+            </div>
+
+            <div class="profile-hero-text">
+                <span class="hero-eyebrow">
+                    <span class="dot"></span>
+                    Активный ученик
+                </span>
+                <h1 class="profile-name">${username or "Пользователь"}</h1>
+                <div class="profile-pills">
+                    <span class="badge badge-xp big">⚡ ${user_xp or 0} XP</span>
+                    <span class="badge badge-subject">Betta Member</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="profile-stats reveal">
+            <div class="info-card">
+                <span class="info-label">Имя пользователя</span>
+                <span class="info-value">${username or "—"}</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Телефон</span>
+                <span class="info-value">${user_phone or "—"}</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Опыт</span>
+                <span class="info-value accent">${user_xp or 0} XP</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Статус</span>
+                <span class="info-value success">Активен</span>
+            </div>
+        </section>
+
+        <!-- Actions -->
+        <section class="profile-actions reveal">
+            <a href="/lessons" class="btn btn-primary btn-lg">
+                Продолжить обучение <span class="btn-arrow">→</span>
+            </a>
+            <a href="/logout" class="btn btn-outline btn-lg">Выйти</a>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-bottom">
+        <span>© Betta API — 2026</span>
+        <span class="text-muted">Учись системно. Расти каждый день.</span>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        var els = document.querySelectorAll('.reveal');
+        if ('IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('revealed');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            els.forEach(function (el) { io.observe(el); });
+        } else {
+            els.forEach(function (el) { el.classList.add('revealed'); });
+        }
+    })();
+</script>
+
+</body>
+</html>

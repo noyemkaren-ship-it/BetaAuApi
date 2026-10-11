@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>429 — Слишком много запросов | Betta</title>
+    <style>${css}</style>
+</head>
+<body>
+
+<%
+    # --- Считаем уровень (как на главной) ---
+    _xp = int(user_xp or 0)
+    _level = _xp // 100 + 1
+    _xp_in_level = _xp % 100
+    _xp_percent = _xp_in_level
+%>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="/" class="brand">
+            <div class="brand-logo">B</div>
+            <div class="brand-text">
+                <span class="brand-name">Betta</span>
+                <span class="brand-tag">Learning Platform</span>
+            </div>
+        </a>
+
+        <nav class="site-nav">
+            <a href="/lessons">Уроки</a>
+            <a href="/me/page">Профиль</a>
+            <a href="#about">О платформе</a>
+        </nav>
+
+        <div class="site-actions">
+            % if user_name:
+                <span class="user-pill">
+                    <span class="user-pill-level">Lv.${_level}</span>
+                    <span class="user-pill-name">${user_name}</span>
+                    <span class="user-pill-xp">${_xp} XP</span>
+                </span>
+                <a href="/logout" class="btn btn-ghost btn-sm">Выйти</a>
+            % else:
+                <a href="/login" class="btn btn-ghost btn-sm">Войти</a>
+                <a href="/register" class="btn btn-primary btn-sm">Начать</a>
+            % endif
+        </div>
+    </div>
+</header>
+
+<!-- ============ 429 CONTENT ============ -->
+<section class="error-page">
+    <div class="error-inner">
+
+        <div class="error-visual reveal">
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="eg1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="var(--primary)"/>
+                        <stop offset="100%" stop-color="var(--accent)"/>
+                    </linearGradient>
+                </defs>
+
+                <circle cx="200" cy="200" r="150" fill="var(--primary-soft)"/>
+                <circle cx="200" cy="200" r="110" fill="var(--bg-elevated)"
+                        stroke="var(--border)"/>
+
+                <!-- Часы / таймер -->
+                <circle cx="200" cy="200" r="70"
+                        stroke="url(#eg1)" stroke-width="6" fill="none"/>
+                <line x1="200" y1="200" x2="200" y2="150"
+                      stroke="url(#eg1)" stroke-width="6" stroke-linecap="round"/>
+                <line x1="200" y1="200" x2="240" y2="215"
+                      stroke="url(#eg1)" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="200" cy="200" r="8" fill="url(#eg1)"/>
+
+                <!-- "молния"/перегрузка -->
+                <path d="M320 90 L300 130 L318 132 L296 175"
+                      stroke="var(--accent)" stroke-width="4"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+                <path d="M80 320 L100 280 L82 278 L104 235"
+                      stroke="var(--primary)" stroke-width="4"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+            </svg>
+        </div>
+
+        <div class="error-content reveal">
+            <span class="error-code">429</span>
+            <h1 class="error-title">
+                Слишком много запросов
+            </h1>
+            <p class="error-sub">
+                Похоже, ты отправил слишком много запросов за короткое время.
+                Немного передохни — и попробуй снова. Так платформа остаётся
+                быстрой для всех.
+            </p>
+
+            <div class="error-hint">
+                <span class="dot"></span>
+                Подожди ~1 секунду и повтори попытку
+            </div>
+
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-lg">
+                    На главную <span class="btn-arrow">→</span>
+                </a>
+                <a href="/lessons" class="btn btn-outline btn-lg">
+                    К урокам
+                </a>
+            </div>
+
+            % if user_name:
+                <div class="error-user">
+                    <span class="user-pill">
+                        <span class="user-pill-level">Lv.${_level}</span>
+                        <span class="user-pill-name">${user_name}</span>
+                        <span class="user-pill-xp">${_xp} XP</span>
+                    </span>
+                </div>
+            % endif
+        </div>
+
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+    <div class="site-footer-inner">
+        <div class="footer-brand">
+            <div class="brand-logo">B</div>
+            <div>
+                <strong>Betta</strong>
+                <p class="text-muted">Платформа для обучения с системой опыта</p>
+            </div>
+        </div>
+
+        <div class="footer-cols">
+            <div>
+                <h4>Платформа</h4>
+                <a href="/lessons">Уроки</a>
+                <a href="/me/page">Профиль</a>
+            </div>
+            <div>
+                <h4>Аккаунт</h4>
+                <a href="/login">Вход</a>
+                <a href="/register">Регистрация</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span>© Betta API — 2026</span>
+        <span class="text-muted">Сделано с ♥ для тех, кто учится</span>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        var els = document.querySelectorAll('.reveal');
+        if (!('IntersectionObserver' in window)) {
+            els.forEach(function (el) { el.classList.add('revealed'); });
+            return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+        els.forEach(function (el) { io.observe(el); });
+    })();
+</script>
+
+</body>
+</html>
